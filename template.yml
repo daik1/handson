@@ -1,10 +1,10 @@
-AWSTemplateFormatVersion: '2010-09-09'
+AWSTemplateFormatVersion: "2010-09-09"
 Transform: AWS::Serverless-2016-10-31
 Description: >
   sam-app
 
   Sample SAM Template for sam-app
-  
+
 # More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
 Globals:
   Function:
@@ -23,6 +23,42 @@ Resources:
           Properties:
             Path: /hello
             Method: get
+
+    ParameterTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+    # テーブルの名前
+      TableName: favoritePlace
+      # 項目の定義
+      AttributeDefinitions:
+        - AttributeName: Id
+          AttributeType: S
+        - AttributeName: placeName
+          AttributeType: S
+        - AttributeName: address
+          AttributeType: S
+        - AttributeName: longitude
+          AttributeType: S
+        - AttributeName: latitude
+          AttributeType: S
+        - AttributeName: comment
+          AttributeType: S
+      # 主キー(HASH),ソートキー(RANGE)の指定
+      KeySchema:
+        - AttributeName: Id
+          KeyType: HASH
+        - AttributeName: address
+          KeyType: RANGE
+      BillingMode: PAY_PER_REQUEST
+      GlobalSecondaryIndexes:
+        - IndexName: GSI0
+          KeySchema:
+            - AttributeName: Id
+              KeyType: HASH
+            - AttributeName: address
+              KeyType: RANGE
+          Projection:
+            ProjectionType: KEYS_ONLY
 
 Outputs:
   # ServerlessRestApi is an implicit API created out of Events key under Serverless::Function

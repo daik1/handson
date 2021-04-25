@@ -23,8 +23,8 @@ Resources:
           Properties:
             Path: /hello
             Method: get
-
-    ParameterTable:
+Resources:
+  DDBTable:
     Type: AWS::DynamoDB::Table
     Properties:
     # テーブルの名前

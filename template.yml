@@ -28,64 +28,42 @@ Resources:
     Type: AWS::DynamoDB::Table
     Properties:
       AttributeDefinitions:
-        - AttributeName: "Album"
+        - AttributeName: "Id"
           AttributeType: "S"
-        - AttributeName: "Artist"
+        - AttributeName: "placeName"
           AttributeType: "S"
-        - AttributeName: "Sales"
+        - AttributeName: "address"
           AttributeType: "N"
-        - AttributeName: "NumberOfSongs"
+        - AttributeName: "longitude"
           AttributeType: "N"
+        - AttributeName: "latitude"
+          AttributeType: "S"
+        - AttributeName: "comment"
+          AttributeType: "S"
       KeySchema:
-        - AttributeName: "Album"
+        - AttributeName: "Id"
           KeyType: "HASH"
-        - AttributeName: "Artist"
+        - AttributeName: "address"
           KeyType: "RANGE"
       ProvisionedThroughput:
         ReadCapacityUnits: "5"
         WriteCapacityUnits: "5"
-      TableName: "myTableName"
+      TableName: "favoritePlace"
       GlobalSecondaryIndexes:
         - IndexName: "myGSI"
           KeySchema:
-            - AttributeName: "Sales"
+            - AttributeName: "Id"
               KeyType: "HASH"
-            - AttributeName: "Artist"
+            - AttributeName: "address"
               KeyType: "RANGE"
           Projection:
             NonKeyAttributes:
-              - "Album"
-              - "NumberOfSongs"
+              - "longitude"
+              - "latitude"
             ProjectionType: "INCLUDE"
           ProvisionedThroughput:
             ReadCapacityUnits: "5"
             WriteCapacityUnits: "5"
-        - IndexName: "myGSI2"
-          KeySchema:
-            - AttributeName: "NumberOfSongs"
-              KeyType: "HASH"
-            - AttributeName: "Sales"
-              KeyType: "RANGE"
-          Projection:
-            NonKeyAttributes:
-              - "Album"
-              - "Artist"
-            ProjectionType: "INCLUDE"
-          ProvisionedThroughput:
-            ReadCapacityUnits: "5"
-            WriteCapacityUnits: "5"
-      LocalSecondaryIndexes:
-        - IndexName: "myLSI"
-          KeySchema:
-            - AttributeName: "Album"
-              KeyType: "HASH"
-            - AttributeName: "Sales"
-              KeyType: "RANGE"
-          Projection:
-            NonKeyAttributes:
-              - "Artist"
-              - "NumberOfSongs"
-            ProjectionType: "INCLUDE"
 # Resources:
 #   DDBTable:
 #     Type: AWS::DynamoDB::Table

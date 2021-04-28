@@ -24,46 +24,84 @@ Resources:
             Path: /hello
             Method: get
 
-  myDynamoDBTable:
+Resources: 
+  myDynamoDBTable: 
     Type: AWS::DynamoDB::Table
-    Properties:
-      AttributeDefinitions:
-        - AttributeName: "Id"
+    Properties: 
+      AttributeDefinitions: 
+        - 
+          AttributeName: "Album"
           AttributeType: "S"
-        - AttributeName: "placeName"
+        - 
+          AttributeName: "Artist"
           AttributeType: "S"
-        - AttributeName: "address"
+        - 
+          AttributeName: "Sales"
           AttributeType: "N"
-        - AttributeName: "longitude"
+        - 
+          AttributeName: "NumberOfSongs"
           AttributeType: "N"
-        - AttributeName: "latitude"
-          AttributeType: "S"
-        - AttributeName: "comment"
-          AttributeType: "S"
-      KeySchema:
-        - AttributeName: "Id"
+      KeySchema: 
+        - 
+          AttributeName: "Album"
           KeyType: "HASH"
-        - AttributeName: "address"
+        - 
+          AttributeName: "Artist"
           KeyType: "RANGE"
-      ProvisionedThroughput:
+      ProvisionedThroughput: 
         ReadCapacityUnits: "5"
         WriteCapacityUnits: "5"
-      TableName: "favoritePlace"
-      GlobalSecondaryIndexes:
-        - IndexName: "myGSI"
-          KeySchema:
-            - AttributeName: "Id"
+      TableName: "myTableName"
+      GlobalSecondaryIndexes: 
+        - 
+          IndexName: "myGSI"
+          KeySchema: 
+            - 
+              AttributeName: "Sales"
               KeyType: "HASH"
-            - AttributeName: "address"
+            - 
+              AttributeName: "Artist"
               KeyType: "RANGE"
-          Projection:
-            NonKeyAttributes:
-              - "longitude"
-              - "latitude"
+          Projection: 
+            NonKeyAttributes: 
+              - "Album"
+              - "NumberOfSongs"
             ProjectionType: "INCLUDE"
-          ProvisionedThroughput:
+          ProvisionedThroughput: 
             ReadCapacityUnits: "5"
             WriteCapacityUnits: "5"
+        - 
+          IndexName: "myGSI2"
+          KeySchema: 
+            - 
+              AttributeName: "NumberOfSongs"
+              KeyType: "HASH"
+            - 
+              AttributeName: "Sales"
+              KeyType: "RANGE"
+          Projection: 
+            NonKeyAttributes: 
+              - "Album"
+              - "Artist"
+            ProjectionType: "INCLUDE"
+          ProvisionedThroughput: 
+            ReadCapacityUnits: "5"
+            WriteCapacityUnits: "5"
+      LocalSecondaryIndexes: 
+        - 
+          IndexName: "myLSI"
+          KeySchema: 
+            - 
+              AttributeName: "Album"
+              KeyType: "HASH"
+            - 
+              AttributeName: "Sales"
+              KeyType: "RANGE"
+          Projection: 
+            NonKeyAttributes: 
+              - "Artist"
+              - "NumberOfSongs"
+            ProjectionType: "INCLUDE"
 # Resources:
 #   DDBTable:
 #     Type: AWS::DynamoDB::Table

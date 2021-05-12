@@ -45,6 +45,7 @@ Resources:
         ReadCapacityUnits: "5"
         WriteCapacityUnits: "5"
       TableName: "myTableName"
+      # 検索を増やしたい場合GSIに追加する
       GlobalSecondaryIndexes:
         - IndexName: "myGSI"
           KeySchema:
@@ -74,6 +75,7 @@ Resources:
           ProvisionedThroughput:
             ReadCapacityUnits: "5"
             WriteCapacityUnits: "5"
+      # テーブルを作るときに定義しておかなければならない
       LocalSecondaryIndexes:
         - IndexName: "myLSI"
           KeySchema:

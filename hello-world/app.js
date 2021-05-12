@@ -12,22 +12,6 @@ exports.handler = async (event) => {
     KeyConditionExpression: "#Sales = :val", //上の２文はプレースホルダー
   };
   const request = await dynamo.query(params).promise();
-  //queryされた結果をsesでメールで送る
-  // const params = {
-  //   Destination: {
-  //     ToAddresses: [shino124sd@gmail.com],
-  //   },
-  //   Message: {
-  //     Body: {
-  //       Text: { Data: "Test" },
-  //     },
-
-  //     Subject: { Data: "Test Email" },
-  //   },
-  //   Source: "SourceEmailAddress",
-  // };
-
-  // return ses.sendEmail(params).promise();
 
   return request.Count;
 };

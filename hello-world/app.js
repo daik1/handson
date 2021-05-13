@@ -2,7 +2,7 @@ const AWS = require("aws-sdk");
 const dynamo = new AWS.DynamoDB.DocumentClient({
   region: "ap-northeast-1", //リージョン
 });
-exports.handler = async (event) => {
+exports.lambdaHandler = async (event) => {
   const sales = event.sales;
   let params = {
     TableName: myTableName, //テーブル名を指定

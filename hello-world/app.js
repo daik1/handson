@@ -1,4 +1,3 @@
-import { DynamoDB } from "aws-sdk";
 const AWS = require("aws-sdk");
 const dynamo = new AWS.DynamoDB.DocumentClient({
   region: "ap-northeast-1", //リージョン

@@ -29,10 +29,10 @@ exports.lambdaHandler = async (event) => {
   ses.sendEmail(mailItem, function (err, data) {
     if (err) {
       console.log(err);
-      context.fail(err);
+      // context.fail(err);
     }
     console.log(data);
-    context.succeed(data);
+    // context.succeed(data);
   });
   // return request.Count;
 };

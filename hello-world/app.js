@@ -22,7 +22,7 @@ exports.lambdaHandler = async (event) => {
       Body: { Text: { Data: request } },
       Subject: { Data: "件名" },
     },
-    Source: "sample.sdfghjoiuhg.com",
+    Source: "sample@sdfghjoiuhg.com",
   };
 
   // メール送信

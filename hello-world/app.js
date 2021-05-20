@@ -13,13 +13,14 @@ exports.lambdaHandler = async (event) => {
     KeyConditionExpression: "#Sales = :val", //上の２文はプレースホルダー
   };
   const request = await dynamo.query(params).promise();
+  console.log(request)
 
   let mailItem = {
     Destination: {
       ToAddresses: ["shino124sd@gmail.com"],
     },
     Message: {
-      Body: { Text: { Data: String(request.Items.Sales) } },
+      Body: { Text: { Data: String(request.Items[0].Sales) } },
       Subject: { Data: "件名" },
     },
     Source: "daikishinohara124@gmail.com",

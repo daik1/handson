@@ -13,7 +13,7 @@ exports.lambdaHandler = async (event) => {
     KeyConditionExpression: "#Sales = :val", //上の２文はプレースホルダー
   };
   const request = await dynamo.query(params).promise();
-  console.log(request)
+  console.log(request);
 
   let mailItem = {
     Destination: {
@@ -25,6 +25,10 @@ exports.lambdaHandler = async (event) => {
     },
     Source: "daikishinohara124@gmail.com",
   };
-  return ses.sendEmail(mailItem).promise()
-
+  try {
+    ses.sendEmail(mailItem).promise();
+  } catch (error) {
+    return { statuscode: 500 };
+  }
+  return { statuscode: 200 };
 };

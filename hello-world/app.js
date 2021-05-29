@@ -2,7 +2,7 @@ const AWS = require("aws-sdk");
 const dynamo = new AWS.DynamoDB.DocumentClient({
   region: "ap-northeast-1", //リージョン
 });
-const ses = new AWS.SES({ region: "ap-northeast-1" });
+const ses = new AWS.SESV2({ region: "ap-northeast-1" });
 exports.lambdaHandler = async (event) => {
   const sales = event.Sales;
   let params = {

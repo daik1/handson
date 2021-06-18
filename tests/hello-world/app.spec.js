@@ -1,21 +1,48 @@
 // import * as AWS from "aws-sdk";
 // const testFunc = require("../../hello-world/app.ts");
-
 // import { Handler } from "aws-lambda";
-
 // import AWS from "aws-sdk";
+// const AWS = require("aws-sdk");
 const { SESV2, DynamoDB } = require("aws-sdk");
-const { mocked } = require("ts-jest/utils");
+// 関数をインポート
 jest.mock("aws-sdk");
-// let mockGetSpy = jest.spyOn(
+// ライブラリをmock化,jsのライブラリをmock化
+const { mocked } = require("ts-jest/utils");
+// let mockQuerySpy = jest.spyOn(
 //   // @ts-ignore
 //   AWS.DynamoDB.services["2012-08-10"]["__super__"].DocumentClient.prototype,
 //   "query"
 // );
-const mockedSES = mocked(SESV2);
-const sendSpy = jest.fn().mockImplementation(() => {
+
+// const querySpy = jest.fn();
+// const mockDynamo = mockedDynamoDB.mockImplementation(() => {
+//   return { query: querySpy };
+// });
+// const mockedDynamoDB = mocked(DynamoDB.DocumentClient);
+const querySpy = jest.fn().mockImplementation(() => {
   return {
-    promise: jest.fn().mockResolvedValue({}),
+    promise: jest.fn().mockResolvedValue({
+      Item: [
+        {
+          Sales: 100,
+        },
+      ],
+    }),
+  };
+});
+// mockedDynamoDB.mockImplementation(() => {
+DynamoDB.DocumentClient.mockImplementation(() => {
+  return {
+    query: querySpy,
+  };
+});
+
+const trueValue = jest.fn().mockResolvedValue({});
+//メール送信SES
+const mockedSES = mocked(SESV2);
+let sendSpy = jest.fn().mockImplementation(() => {
+  return {
+    promise: trueValue,
   };
 });
 
@@ -25,13 +52,6 @@ mockedSES.mockImplementation(() => {
     sendEmail: sendSpy,
   };
 });
-const mockedDynamoDB = mocked(DynamoDB);
-const querySpy = jest.fn();
-mockedDynamoDB.mockImplementation(() => {
-  return { query: querySpy };
-});
-// import { mocked } from "ts-jest/utils";
-// import { salesObject } from "./interface/mockInterface";
 
 //正常系か異常系でdescribeは大きく分ける
 describe("appのテスト", () => {
@@ -41,58 +61,81 @@ describe("appのテスト", () => {
   // } = require("../../hello-world/app.ts");
   describe("正常系", () => {
     let resultData;
-
+    let event = {
+      Sales: 100,
+    };
     beforeEach(async () => {
-      let event = {
-        Sales: 100,
-      };
-      let expectData = {
-        Sales: 100,
-      };
-      querySpy.mockReturnValue({
-        promise: jest.fn().mockResolvedValue(expectData),
-      });
-      // @ts-ignore
       resultData = await testFunc.lambdaHandler(event);
     });
     it("dynamodbから正しい値を取得していること", () => {
       ///書ける
+      let expectedQueryParam = {
+        TableName: "myTableName", //テーブル名を指定
+        IndexName: "myGSI", //インデックス名を指定
+        ExpressionAttributeNames: { "#Sales": "Sales" },
+        ExpressionAttributeValues: { ":val": event.Sales },
+        KeyConditionExpression: "#Sales = :val", //上の２文はプレースホルダー
+      };
 
-      expect(querySpy).toHaveBeenCalled();
-      // mockGetSpy.mockReturnValue(expectData);
+      expect(querySpy).toHaveBeenCalledWith(expectedQueryParam);
     });
     it("正しい引数でsesメール送信メソッドを呼んでいること", () => {
-      const mailToStub = "dummyToMail";
-      const mailFromStub = "dummyFromMail";
-      const dummyMessage = "dummy";
+      let expectSales = 100;
 
       let expectedParams = {
         Destination: {
-          ToAddresses: [mailToStub],
+          ToAddresses: ["shino124sd@gmail.com"],
         },
-        Message: {
-          Body: { Text: { Data: dummyMessage } },
-          Subject: { Data: "件名" },
+        Content: {
+          Simple: {
+            Body: { Text: { Data: String(expectSales) } },
+            Subject: { Data: "件名" },
+          },
         },
-        Source: mailFromStub,
+        FromEmailAddress: "daikishinohara124@gmail.com",
       };
       expect(sendSpy).toHaveBeenCalledWith(expectedParams);
     });
     it("メ-ル送信成功時ステータスコード200が返却されること", () => {
       //メール送信成功
       expect(sendSpy).toHaveBeenCalled();
-
       expect(resultData).toEqual({ statusCode: 200 });
       //expected
     });
   });
   describe("異常系", () => {
-    // it("メ-ル送信失敗時ステータスコード500が返却されること", () => {
-    //   expect(sendSpy).toHaveBeenCalled();
-    //   expect(resultData).toEqual({ statusCode: 200 });
-    // });
+    let resultData;
+    let event = {
+      Sales: 100,
+    };
+    const errorValue = jest
+      .fn()
+      .mockResolvedValue(new Error("This is an SES error"));
+    const errorSendSpy = jest.fn().mockImplementation(() => {
+      return {
+        promise: errorValue,
+      };
+    });
+
+    // @ts-ignore
+    mockedSES.mockImplementation(() => {
+      return {
+        sendEmail: errorSendSpy,
+      };
+    });
+
+    beforeEach(async () => {
+      resultData = await testFunc.lambdaHandler(event);
+    });
+    it("メ-ル送信失敗時ステータスコード500が返却されること", () => {
+      expect(errorSendSpy).toHaveBeenCalledTimes(1);
+      expect(resultData).toEqual({ statusCode: 500 });
+    });
   });
   afterEach(async () => {
     querySpy.mockClear();
+    sendSpy.mockClear();
+    trueValue.mockClear();
+    // mockedSES.mockClear();
   });
 });

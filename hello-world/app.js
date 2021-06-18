@@ -18,30 +18,36 @@ exports.lambdaHandler = async (event) => {
     KeyConditionExpression: "#Sales = :val", //上の２文はプレースホルダー
   };
   const response = await dynamo.query(params).promise();
-  if (!response.Items || response.Items.length === 0) {
-    return;
-  }
-  for (const { Sales } of response.Items) {
-    let mailItem = {
-      // let mailItem: SESV2.Types.SendEmailRequest = {
-      Destination: {
-        ToAddresses: ["shino124sd@gmail.com"],
-      },
-      Content: {
-        Simple: { Body: { Text: { Data: Sales } }, Subject: { Data: "件名" } },
-      },
-      FromEmailAddress: "daikishinohara124@gmail.com",
-    };
-    try {
-      ses.sendEmail(mailItem).promise();
-    } catch (error) {
-      return { statuscode: 500 };
-    }
-    return { statuscode: 200 };
-  }
   console.log(response);
-  //dynamodbを呼び出していること
-  //sesが呼ばれていること
-  //sesが正常に呼ばれたら200を返すこと
-  //sesが失敗したら500エラーを返すこと
+  // .promise();
+  // if (!response.Items || response.Items.length === 0) {
+  //   return;
+  // }
+  // for (const { Sales } of response.Items) {
+  let mailItem = {
+    Destination: {
+      ToAddresses: ["shino124sd@gmail.com"],
+    },
+    Content: {
+      Simple: {
+        Body: { Text: { Data: String(response.Item[0].Sales) } },
+        Subject: { Data: "件名" },
+      },
+    },
+    FromEmailAddress: "daikishinohara124@gmail.com",
+  };
+  try {
+    const sesResponse = await ses.sendEmail(mailItem).promise();
+    console.log(sesResponse);
+  } catch (error) {
+    console.log(error);
+    return { statusCode: 500 };
+  }
+  return { statusCode: 200 };
 };
+// console.log(response);
+//dynamodbを呼び出していること
+//sesが呼ばれていること
+//sesが正常に呼ばれたら200を返すこと
+//sesが失敗したら500エラーを返すこと
+// };
